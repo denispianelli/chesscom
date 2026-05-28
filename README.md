@@ -13,7 +13,7 @@ rate limiting, ETag caching, runtime response validation, and lazy pagination.
 - ✅ Isomorphic — native `fetch`, runs in Node 18+, Deno, Bun, the browser
 - ✅ One dependency (`zod`)
 
-> ⚠️ Work in progress. API not stable until `1.0.0`.
+> ⚠️ Work in progress. The API is not stable until `1.0.0`.
 
 ## Install
 
@@ -31,15 +31,157 @@ const client = new ChessComClient({
   userAgent: "myapp/1.0 (me@example.com)",
 });
 
-const player = await client.getPlayer("hikaru");
+const profile = await client.getPlayer("hikaru");
 const stats = await client.getPlayerStats("hikaru");
 
+// Lazily stream a player's games across monthly archives:
 for await (const game of client.streamPlayerGames("hikaru", {
   since: "2024-01",
 })) {
-  console.log(game.url);
+  console.log(game.url, game.pgn);
 }
 ```
+
+## Why a `userAgent` is required
+
+Chess.com rejects requests without a descriptive `User-Agent` (HTTP 403) and asks
+that you include a way to contact you. The client therefore **requires** it at
+construction. Use `"<app>/<version> (<contact>)"`, e.g.
+`"my-bot/1.0 (me@example.com)"`.
+
+> Note: in browsers, `fetch` ignores a custom `User-Agent` (it is a forbidden
+> header). The option only takes effect on Node, Deno, and Bun.
+
+## API
+
+All methods return validated, fully typed results.
+
+| Method                                  | Returns                | Endpoint                               |
+| --------------------------------------- | ---------------------- | -------------------------------------- |
+| `getPlayer(username)`                   | `PlayerProfile`        | `/player/{username}`                   |
+| `getPlayerStats(username)`              | `PlayerStats`          | `/player/{username}/stats`             |
+| `getPlayerArchives(username)`           | `PlayerArchives`       | `/player/{username}/games/archives`    |
+| `getPlayerGames(username, year, month)` | `Game[]`               | `/player/{username}/games/{YYYY}/{MM}` |
+| `streamPlayerGames(username, options?)` | `AsyncGenerator<Game>` | iterates over the monthly archives     |
+
+Each method also accepts a final options object with an `AbortSignal`:
+
+```ts
+const controller = new AbortController();
+const profile = await client.getPlayer("hikaru", { signal: controller.signal });
+```
+
+### `streamPlayerGames`
+
+Hides the monthly pagination: it lists the archives, then fetches one month at a
+time (lazily) and yields game by game. The rate limiter and cache apply per
+month, so re-runs are fast and polite.
+
+```ts
+for await (const game of client.streamPlayerGames("hikaru", {
+  since: "2024-01", // YYYY-MM, inclusive
+  until: "2024-12", // YYYY-MM, inclusive
+  order: "newest-first", // or "oldest-first" (default: newest-first)
+  timeClass: "blitz", // keep only blitz games
+  rated: true, // keep only rated games
+})) {
+  // …
+}
+```
+
+Months outside the `since`/`until` window are never requested.
+
+## Configuration
+
+```ts
+new ChessComClient({
+  userAgent: "myapp/1.0 (me@example.com)", // required
+  fetch, // custom fetch (default: global fetch)
+  cache, // custom CacheStore (default: in-memory Map)
+  timeout: 10_000, // per-request timeout in ms (default: none)
+  baseUrl: "https://api.chess.com/pub", // default
+  onValidationError: "throw", // "throw" | "warn" | "ignore" (default: "throw")
+  onRateLimit: (info) => console.warn("rate limited", info),
+});
+```
+
+## Error handling
+
+Every error thrown by the SDK extends `ChessComError` and carries a discriminant
+`kind`. Branch with `instanceof` or `switch (err.kind)`.
+
+```ts
+import { ChessComError, NotFoundError } from "@dpianelli/chesscom";
+
+try {
+  await client.getPlayer("does-not-exist");
+} catch (err) {
+  if (err instanceof NotFoundError) {
+    // …
+  } else if (err instanceof ChessComError) {
+    console.error(err.kind, err.status, err.url);
+  }
+}
+```
+
+| Error             | `kind`       | When                                           |
+| ----------------- | ------------ | ---------------------------------------------- |
+| `NotFoundError`   | `not_found`  | HTTP 404 / 410                                 |
+| `RateLimitError`  | `rate_limit` | HTTP 429 after retries are exhausted           |
+| `ForbiddenError`  | `forbidden`  | HTTP 403 (often a missing/rejected User-Agent) |
+| `ServerError`     | `server`     | HTTP 5xx or an unexpected status               |
+| `ValidationError` | `validation` | A response did not match its schema            |
+| `NetworkError`    | `network`    | The request never produced a response          |
+
+## Validation
+
+Responses are validated against zod schemas. If the API drifts from the expected
+shape, `onValidationError` decides what happens:
+
+- `"throw"` (default) — throw a `ValidationError`.
+- `"warn"` — log a warning and return the raw data.
+- `"ignore"` — return the raw data silently.
+
+## Rate limiting
+
+Chess.com asks clients to make requests serially (parallel requests get a 429).
+By default the client funnels all requests through a serial queue and retries a
+429 with exponential backoff, honoring the server's `Retry-After`. This is
+per-client instance; share one client to share the queue.
+
+## Caching
+
+The client revalidates with ETags (`If-None-Match`) and serves the cached body on
+`304 Not Modified`. The default store is an in-memory `Map`. Plug in your own by
+implementing `CacheStore`:
+
+```ts
+import type { CacheStore, CacheEntry } from "@dpianelli/chesscom";
+
+class RedisCacheStore implements CacheStore {
+  constructor(private redis: import("ioredis").Redis) {}
+
+  async get(key: string): Promise<CacheEntry | undefined> {
+    const raw = await this.redis.get(key);
+    return raw ? (JSON.parse(raw) as CacheEntry) : undefined;
+  }
+
+  async set(key: string, value: CacheEntry): Promise<void> {
+    await this.redis.set(key, JSON.stringify(value));
+  }
+}
+
+const client = new ChessComClient({
+  userAgent: "myapp/1.0 (me@example.com)",
+  cache: new RedisCacheStore(redis),
+});
+```
+
+## Requirements
+
+- The published library runs on **Node 18+**, Deno, Bun, and browsers (anything
+  with a global `fetch`).
+- Contributing to this repo requires **Node 22+** (the dev toolchain).
 
 ## Documentation
 

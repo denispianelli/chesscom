@@ -13,6 +13,14 @@
   ],
   "author": "dpianelli",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/denispianelli/chesscom.git"
+  },
+  "homepage": "https://github.com/denispianelli/chesscom#readme",
+  "bugs": {
+    "url": "https://github.com/denispianelli/chesscom/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

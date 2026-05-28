@@ -94,9 +94,12 @@ absorbs a real variation.** Otherwise, don't.
 
 ## 7. Tests
 
-- **A mirroring test file per module**: `foo.ts` → `foo.test.ts` (co-located, or
-  under `test/`).
-- Deterministic tests: injected `fetch` + fixtures, **no network in CI**.
+- **Unit tests are co-located** with the code they cover: `foo.ts` →
+  `foo.test.ts`. They run on every `npm test` and in CI.
+- **Integration tests live under `test/integration/`** and hit the live API.
+  They are excluded from `npm test`/CI and run on demand via
+  `npm run test:integration`.
+- Deterministic unit tests: injected `fetch` + fixtures, **no network in CI**.
 - We test **behavior** (serialization, backoff, 304, typed errors), not private
   implementation details.
 - Realistic fixtures captured from the real API, stored in `test/fixtures/`.

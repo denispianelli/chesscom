@@ -4,7 +4,9 @@
     ".": {
       "release-type": "node",
       "package-name": "@dpianelli/chesscom",
-      "changelog-path": "CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md",
+      "release-as": "0.1.0",
+      "bump-minor-pre-major": true
     }
   }
 }

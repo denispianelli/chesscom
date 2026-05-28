@@ -30,5 +30,11 @@ export {
   type FetchTransportConfig,
 } from "./infrastructure/transport/fetch-transport.js";
 
+export {
+  RateLimiter,
+  type RateLimiterConfig,
+  type RateLimitInfo,
+} from "./infrastructure/transport/rate-limiter.js";
+
 /** Package version, kept in sync with package.json at release time. */
 export const VERSION = "0.0.0";

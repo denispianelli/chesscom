@@ -1,0 +1,28 @@
+{
+  "clubs": [
+    {
+      "@id": "https://www.chess.com/club/open-discussion",
+      "name": "Open Discussion",
+      "last_activity": 1626902692,
+      "icon": "https://images.chesscomfiles.com/uploads/v1/group/3541.45d6eb2c.50x50o.af307b09ebe7.png",
+      "url": "https://www.chess.com/club/open-discussion",
+      "joined": 1468775412
+    },
+    {
+      "@id": "https://www.chess.com/club/chesscom-staff",
+      "name": "Chess.com Staff",
+      "last_activity": 1779755193,
+      "icon": "https://images.chesscomfiles.com/uploads/v1/group/4205.0c07949b.50x50o.40ce974d8493.png",
+      "url": "https://www.chess.com/club/chesscom-staff",
+      "joined": 1215559174
+    },
+    {
+      "@id": "https://www.chess.com/club/team-usa-southwest",
+      "name": "Team USA - Southwest",
+      "last_activity": 1699716639,
+      "icon": "https://images.chesscomfiles.com/uploads/v1/group/4502.e4147797.50x50o.6a5ef662fda4.gif",
+      "url": "https://www.chess.com/club/team-usa-southwest",
+      "joined": 1228969558
+    }
+  ]
+}

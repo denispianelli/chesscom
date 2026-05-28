@@ -1,0 +1,38 @@
+{
+  "finished": [
+    {
+      "url": "https://www.chess.com/tournament/100-years-of-chemotherapy---remembrance-tournament",
+      "@id": "https://api.chess.com/pub/tournament/100-years-of-chemotherapy---remembrance-tournament",
+      "wins": 11,
+      "losses": 5,
+      "draws": 0,
+      "points_awarded": 31,
+      "placement": 10,
+      "status": "eliminated",
+      "total_players": 100
+    },
+    {
+      "url": "https://www.chess.com/tournament/10th-chesscom-quick-knockouts-1801-2000",
+      "@id": "https://api.chess.com/pub/tournament/10th-chesscom-quick-knockouts-1801-2000",
+      "wins": 2,
+      "losses": 7,
+      "draws": 1,
+      "points_awarded": 0,
+      "placement": 159,
+      "status": "eliminated",
+      "total_players": 210
+    }
+  ],
+  "in_progress": [
+    {
+      "url": "https://www.chess.com/tournament/2026-staff-daily-championship",
+      "@id": "https://api.chess.com/pub/tournament/2026-staff-daily-championship",
+      "wins": 6,
+      "losses": 4,
+      "draws": 0,
+      "status": "eliminated",
+      "total_players": 65
+    }
+  ],
+  "registered": []
+}

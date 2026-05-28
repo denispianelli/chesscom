@@ -50,7 +50,6 @@ export { MapCacheStore } from "./infrastructure/transport/map-cache-store.js";
 export type {
   PlayerProfile,
   PlayerStats,
-  PlayerArchives,
 } from "./infrastructure/schemas/player.js";
 
 export type {
@@ -58,6 +57,22 @@ export type {
   GamePlayer,
   MonthlyGames,
 } from "./infrastructure/schemas/game.js";
+
+export type {
+  ClubProfile,
+  ClubMember,
+  ClubMembers,
+  PlayerClub,
+  PlayerClubs,
+} from "./infrastructure/schemas/club.js";
+
+export type {
+  Tournament,
+  TournamentSettings,
+  TournamentPlayer,
+  PlayerTournamentEntry,
+  PlayerTournaments,
+} from "./infrastructure/schemas/tournament.js";
 
 /** Package version, kept in sync with package.json at release time. */
 export const VERSION = "0.0.0";

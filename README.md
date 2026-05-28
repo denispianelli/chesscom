@@ -60,9 +60,14 @@ All methods return validated, fully typed results.
 | --------------------------------------- | ---------------------- | -------------------------------------- |
 | `getPlayer(username)`                   | `PlayerProfile`        | `/player/{username}`                   |
 | `getPlayerStats(username)`              | `PlayerStats`          | `/player/{username}/stats`             |
-| `getPlayerArchives(username)`           | `PlayerArchives`       | `/player/{username}/games/archives`    |
+| `getPlayerArchives(username)`           | `string[]`             | `/player/{username}/games/archives`    |
 | `getPlayerGames(username, year, month)` | `Game[]`               | `/player/{username}/games/{YYYY}/{MM}` |
 | `streamPlayerGames(username, options?)` | `AsyncGenerator<Game>` | iterates over the monthly archives     |
+| `getPlayerClubs(username)`              | `PlayerClub[]`         | `/player/{username}/clubs`             |
+| `getPlayerTournaments(username)`        | `PlayerTournaments`    | `/player/{username}/tournaments`       |
+| `getClub(urlId)`                        | `ClubProfile`          | `/club/{url-id}`                       |
+| `getClubMembers(urlId)`                 | `ClubMembers`          | `/club/{url-id}/members`               |
+| `getTournament(urlId)`                  | `Tournament`           | `/tournament/{url-id}`                 |
 
 Each method also accepts a final options object with an `AbortSignal`:
 

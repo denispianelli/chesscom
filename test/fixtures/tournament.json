@@ -1,0 +1,45 @@
+{
+  "name": "100 Years of Chemotherapy - Remembrance Tournament",
+  "url": "https://www.chess.com/tournament/100-years-of-chemotherapy---remembrance-tournament",
+  "description": "<p>100 Years of Chemotherapy! It was the start of a revolutionary treatment by the German Paul Ehrlich. It saved thousands of lives ever since its first employment in 1909! This tournament is dedicated to all those people around the world, who know the hardships of cancer. Almost all of us have someone in our family or a friend who encountered this most wicked disease.</p>\n<p>Play in this tournament while rendering homage to science and all those who suffered; at the same time remember those who were not able to win the fight.</p>",
+  "creator": "arcueid",
+  "status": "finished",
+  "finish_time": 1308282152,
+  "settings": {
+    "type": "round_robin",
+    "rules": "chess",
+    "is_rated": true,
+    "is_official": false,
+    "is_invite_only": false,
+    "initial_group_size": 5,
+    "user_advance_count": 1,
+    "use_tiebreak": true,
+    "allow_vacation": true,
+    "winner_places": 3,
+    "registered_user_count": 100,
+    "games_per_opponent": 2,
+    "total_rounds": 3,
+    "concurrent_games_per_opponent": 1,
+    "time_class": "daily",
+    "time_control": "1/259200"
+  },
+  "players": [
+    {
+      "username": "erik",
+      "status": "eliminated"
+    },
+    {
+      "username": "jaguarphd",
+      "status": "eliminated"
+    },
+    {
+      "username": "vampirelestrat",
+      "status": "eliminated"
+    }
+  ],
+  "rounds": [
+    "https://api.chess.com/pub/tournament/100-years-of-chemotherapy---remembrance-tournament/1",
+    "https://api.chess.com/pub/tournament/100-years-of-chemotherapy---remembrance-tournament/2",
+    "https://api.chess.com/pub/tournament/100-years-of-chemotherapy---remembrance-tournament/3"
+  ]
+}

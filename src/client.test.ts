@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import erikProfile from "../test/fixtures/player-erik.json";
 import erikGames from "../test/fixtures/games-erik-2024-01.json";
+import clubProfile from "../test/fixtures/club-dev-community.json";
+import clubMembers from "../test/fixtures/club-members-team-usa.json";
+import playerClubs from "../test/fixtures/player-clubs-erik.json";
+import tournament from "../test/fixtures/tournament.json";
+import playerTournaments from "../test/fixtures/player-tournaments-erik.json";
 import { ChessComClient } from "./client.js";
 import { NotFoundError, ValidationError } from "./domain/errors.js";
 
@@ -183,6 +188,82 @@ describe("ChessComClient.streamPlayerGames", () => {
     );
 
     expect(urls).toEqual(["blitz-1"]);
+  });
+});
+
+describe("ChessComClient.getPlayerArchives", () => {
+  it("unwraps the archives wrapper into a string array", async () => {
+    const { fn, calls } = mockFetch(() =>
+      json({
+        archives: ["https://api.chess.com/pub/player/erik/games/2024/01"],
+      }),
+    );
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const archives = await client.getPlayerArchives("erik");
+
+    expect(calls[0]?.url).toBe(
+      "https://api.chess.com/pub/player/erik/games/archives",
+    );
+    expect(archives).toEqual([
+      "https://api.chess.com/pub/player/erik/games/2024/01",
+    ]);
+  });
+});
+
+describe("ChessComClient clubs", () => {
+  it("getClub builds the URL and returns the profile", async () => {
+    const { fn, calls } = mockFetch(() => json(clubProfile));
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const club = await client.getClub("chess-com-developer-community");
+
+    expect(calls[0]?.url).toBe(
+      "https://api.chess.com/pub/club/chess-com-developer-community",
+    );
+    expect(club.club_id).toBe(clubProfile.club_id);
+  });
+
+  it("getClubMembers returns the activity groups", async () => {
+    const { fn } = mockFetch(() => json(clubMembers));
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const members = await client.getClubMembers("team-usa");
+
+    expect(members.weekly.length).toBe(clubMembers.weekly.length);
+  });
+
+  it("getPlayerClubs unwraps to an array", async () => {
+    const { fn } = mockFetch(() => json(playerClubs));
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const clubs = await client.getPlayerClubs("erik");
+
+    expect(Array.isArray(clubs)).toBe(true);
+    expect(clubs.length).toBe(playerClubs.clubs.length);
+  });
+});
+
+describe("ChessComClient tournaments", () => {
+  it("getTournament builds the URL and returns the tournament", async () => {
+    const { fn, calls } = mockFetch(() => json(tournament));
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const result = await client.getTournament("some-tournament-id");
+
+    expect(calls[0]?.url).toBe(
+      "https://api.chess.com/pub/tournament/some-tournament-id",
+    );
+    expect(result.name).toBe(tournament.name);
+  });
+
+  it("getPlayerTournaments returns the grouped participation", async () => {
+    const { fn } = mockFetch(() => json(playerTournaments));
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const result = await client.getPlayerTournaments("erik");
+
+    expect(result.finished?.length).toBe(playerTournaments.finished.length);
   });
 });
 

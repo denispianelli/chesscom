@@ -12,7 +12,6 @@ import {
   playerArchivesSchema,
   playerProfileSchema,
   playerStatsSchema,
-  type PlayerArchives,
   type PlayerProfile,
   type PlayerStats,
 } from "./infrastructure/schemas/player.js";
@@ -20,6 +19,20 @@ import {
   monthlyGamesSchema,
   type Game,
 } from "./infrastructure/schemas/game.js";
+import {
+  clubMembersSchema,
+  clubProfileSchema,
+  playerClubsSchema,
+  type ClubMembers,
+  type ClubProfile,
+  type PlayerClub,
+} from "./infrastructure/schemas/club.js";
+import {
+  playerTournamentsSchema,
+  tournamentSchema,
+  type PlayerTournaments,
+  type Tournament,
+} from "./infrastructure/schemas/tournament.js";
 
 const DEFAULT_BASE_URL = "https://api.chess.com/pub";
 
@@ -133,15 +146,16 @@ export class ChessComClient {
   }
 
   /** Fetch the list of a player's monthly game-archive URLs. */
-  getPlayerArchives(
+  async getPlayerArchives(
     username: string,
     options?: RequestOptions,
-  ): Promise<PlayerArchives> {
-    return this.#get(
+  ): Promise<string[]> {
+    const { archives } = await this.#get(
       `/player/${encodeURIComponent(username)}/games/archives`,
       playerArchivesSchema,
       options,
     );
+    return archives;
   }
 
   /**
@@ -179,7 +193,7 @@ export class ChessComClient {
     const { since, until, order = "newest-first", timeClass, rated } = options;
     const reqOptions = options.signal ? { signal: options.signal } : undefined;
 
-    const { archives } = await this.getPlayerArchives(username, reqOptions);
+    const archives = await this.getPlayerArchives(username, reqOptions);
     let months = archives
       .map(parseArchiveMonth)
       .filter((m): m is ArchiveMonth => m !== undefined);
@@ -207,6 +221,61 @@ export class ChessComClient {
         yield game;
       }
     }
+  }
+
+  /** Fetch a club's public profile by its URL id (e.g. `"team-usa"`). */
+  getClub(urlId: string, options?: RequestOptions): Promise<ClubProfile> {
+    return this.#get(
+      `/club/${encodeURIComponent(urlId)}`,
+      clubProfileSchema,
+      options,
+    );
+  }
+
+  /** Fetch a club's members, grouped by recent activity. */
+  getClubMembers(
+    urlId: string,
+    options?: RequestOptions,
+  ): Promise<ClubMembers> {
+    return this.#get(
+      `/club/${encodeURIComponent(urlId)}/members`,
+      clubMembersSchema,
+      options,
+    );
+  }
+
+  /** Fetch the clubs a player belongs to. */
+  async getPlayerClubs(
+    username: string,
+    options?: RequestOptions,
+  ): Promise<PlayerClub[]> {
+    const { clubs } = await this.#get(
+      `/player/${encodeURIComponent(username)}/clubs`,
+      playerClubsSchema,
+      options,
+    );
+    return clubs;
+  }
+
+  /** Fetch a tournament by its URL id. */
+  getTournament(urlId: string, options?: RequestOptions): Promise<Tournament> {
+    return this.#get(
+      `/tournament/${encodeURIComponent(urlId)}`,
+      tournamentSchema,
+      options,
+    );
+  }
+
+  /** Fetch a player's tournament participation, grouped by state. */
+  getPlayerTournaments(
+    username: string,
+    options?: RequestOptions,
+  ): Promise<PlayerTournaments> {
+    return this.#get(
+      `/player/${encodeURIComponent(username)}/tournaments`,
+      playerTournamentsSchema,
+      options,
+    );
   }
 
   /** Perform a GET, then validate the body against `schema`. */

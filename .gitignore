@@ -5,3 +5,7 @@ coverage
 .DS_Store
 .env
 .env.*
+
+# Scratch files used to capture command output during development
+.tmp-*
+.diag.txt

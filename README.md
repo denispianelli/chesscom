@@ -188,10 +188,16 @@ const client = new ChessComClient({
   with a global `fetch`).
 - Contributing to this repo requires **Node 22+** (the dev toolchain).
 
+## Contributing
+
+Contributions are welcome — see [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+
 ## Documentation
 
 - [`SPEC.md`](./SPEC.md) — technical design and architecture
 - [`STYLE.md`](./STYLE.md) — code conventions
+- [`CONTRIBUTING.md`](./CONTRIBUTING.md) — how to contribute
+- [`RELEASING.md`](./RELEASING.md) — release & publish process
 
 ## License
 

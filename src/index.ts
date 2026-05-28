@@ -7,6 +7,13 @@
  */
 
 export {
+  ChessComClient,
+  type ChessComClientOptions,
+  type RequestOptions,
+  type ValidationErrorMode,
+} from "./client.js";
+
+export {
   ChessComError,
   NotFoundError,
   ForbiddenError,

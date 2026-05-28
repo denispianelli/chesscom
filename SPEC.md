@@ -1,29 +1,29 @@
-# `@dpianelli/chesscom` — Spec technique
+# `@dpianelli/chesscom` — Technical spec
 
 > Unofficial TypeScript SDK for the [Chess.com Published-Data API](https://www.chess.com/news/view/published-data-api).
 > Not affiliated with, endorsed by, or sponsored by Chess.com.
 
-Ce document fige les décisions de design issues du brainstorm initial. Il sert de
-référence pendant l'implémentation. Toute déviation doit être un choix conscient,
-pas une dérive.
+This document records the design decisions made during the initial brainstorm.
+It is the reference during implementation. Any deviation must be a deliberate
+choice, not drift.
 
 ---
 
-## 1. Identité du projet
+## 1. Project identity
 
-| Aspect         | Décision                                                         |
-| -------------- | ---------------------------------------------------------------- |
-| **Nom npm**    | `@dpianelli/chesscom` (scope = username `dpianelli`)             |
-| **Langage**    | TypeScript, isomorphe (Node 18+, Deno, Bun, navigateur)          |
-| **Runtime**    | `fetch` natif global — pas de lib HTTP                           |
-| **Dépendance** | **Une seule : `zod`** (validation runtime des réponses)          |
-| **Ambition**   | Librairie publiable sérieuse : tests, CI, docs, semver           |
-| **Scope v1**   | **Player-first** — tout l'univers joueur, le reste vient ensuite |
-| **Licence**    | MIT (à confirmer)                                                |
+| Aspect         | Decision                                                    |
+| -------------- | ----------------------------------------------------------- |
+| **npm name**   | `@dpianelli/chesscom` (scope = npm username `dpianelli`)    |
+| **Language**   | TypeScript, isomorphic (Node 18+, Deno, Bun, browser)       |
+| **Runtime**    | native global `fetch` — no HTTP library                     |
+| **Dependency** | **Exactly one: `zod`** (runtime response validation)        |
+| **Ambition**   | A serious, publishable library: tests, CI, docs, semver     |
+| **v1 scope**   | **Player-first** — the whole player surface, the rest later |
+| **License**    | MIT                                                         |
 
-**Découvrabilité + marque** : « chesscom » est dans le nom (→ recherche npm) et le
-scope `@dpianelli/` signale clairement le caractère non-officiel (→ couvre le risque
-de marque). Renforcer via `keywords` + disclaimer README.
+**Discoverability + trademark**: "chesscom" is in the name (→ npm search) and the
+`@dpianelli/` scope clearly signals the unofficial nature (→ covers trademark
+risk). Reinforced via `keywords` + a README disclaimer.
 
 ```jsonc
 // package.json
@@ -32,118 +32,119 @@ de marque). Renforcer via `keywords` + disclaimer README.
 
 ---
 
-## 2. Principes de design
+## 2. Design principles
 
-1. **PGN brut.** Les parties exposent leur PGN comme `string` (+ JSDoc), plus les
-   champs structurés déjà fournis par l'API (`white`, `black`, `time_control`,
-   `eco`, `end_time`…). **Aucun parsing de coups** — l'utilisateur branche sa
-   propre lib (`chess.js`, `@mliebelt/pgn-parser`, etc.).
-2. **Une seule couche HTTP interne.** Transport + rate-limit + cache + retry. Les
-   resources (endpoints) sont des fonctions minces au-dessus.
-3. **Pas de magie globale.** `new ChessComClient(opts)` ; tout est injectable
-   (fetch, cache, transport). Aucun singleton implicite → testable.
-4. **`User-Agent` obligatoire** à l'instanciation. Chess.com renvoie `403` sinon, et
-   recommande un contact. Le SDK le **force** (pas une option oubliable).
+1. **Raw PGN.** Games expose their PGN as a `string` (+ JSDoc), plus the
+   structured fields the API already provides (`white`, `black`, `time_control`,
+   `eco`, `end_time`, …). **No move parsing** — the consumer plugs in their own
+   library (`chess.js`, `@mliebelt/pgn-parser`, etc.).
+2. **A single internal HTTP layer.** Transport + rate-limit + cache + retry. The
+   resources (endpoints) are thin functions on top of it.
+3. **No global magic.** `new ChessComClient(opts)`; everything is injectable
+   (fetch, cache, transport). No implicit singletons → testable.
+4. **Mandatory `User-Agent`** at construction. Chess.com returns `403` without
+   one and recommends a contact. The SDK **forces** it (not a forgettable option).
 
 ---
 
-## 3. Architecture — Hexagonal pragmatique
+## 3. Architecture — Pragmatic hexagonal
 
-Règle de dépendance : **le cœur ne dépend de rien ; les détails dépendent du cœur.**
-On prend le seul principe de clean archi qui paie sur un SDK (ports & adapters,
-domain pur, injection) et **rien de la ceremony inutile** (pas de couche use-case,
-pas de mapping DTO↔entity quand l'API renvoie déjà la bonne forme).
+Dependency rule: **the core depends on nothing; details depend on the core.**
+We take the one clean-architecture principle that pays off in an SDK (ports &
+adapters, pure domain, injection) and **none of the useless ceremony** (no
+use-case layer, no DTO↔entity mapping when the API already returns the right
+shape).
 
-> **Règle d'or anti-sur-architecture :** on n'ajoute une couche que quand elle
-> absorbe une vraie variation. Le port HTTP absorbe « fetch vs mock vs autre
-> runtime » → justifié. Une couche use-case n'absorberait rien → on s'en passe.
+> **Anti-over-engineering rule:** add a layer only when it absorbs a real
+> variation. The HTTP port absorbs "fetch vs mock vs other runtime" → justified.
+> A use-case layer would absorb nothing → we skip it.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  domain/            le cœur — ZÉRO dépendance externe      │
-│   • types métier : Player, Game, Stats, …                 │
-│   • erreurs : ChessComError & sous-types                  │
-│   • ports (interfaces) : HttpTransport, CacheStore        │
+│  domain/            the core — ZERO external dependency    │
+│   • domain types: Player, Game, Stats, …                  │
+│   • errors: ChessComError & subtypes                      │
+│   • ports (interfaces): HttpTransport, CacheStore         │
 ├─────────────────────────────────────────────────────────┤
-│  application/       orchestration — dépend de domain       │
-│   • resources/player.ts : compose les ports               │
-│   • pagination paresseuse (streamPlayerGames)             │
+│  application/       orchestration — depends on domain      │
+│   • resources/player.ts: composes the ports               │
+│   • lazy pagination (streamPlayerGames)                   │
 ├─────────────────────────────────────────────────────────┤
-│  infrastructure/    adapters — dépend de domain            │
-│   • FetchTransport       implémente HttpTransport         │
-│   • RateLimiter          décore le transport              │
-│   • EtagCache            implémente CacheStore            │
-│   • schemas/ (zod) + dérivation des types domain          │
+│  infrastructure/    adapters — depends on domain           │
+│   • FetchTransport       implements HttpTransport         │
+│   • RateLimiter          decorates the transport          │
+│   • EtagCache            implements the caching decorator │
+│   • schemas/ (zod) + domain type derivation               │
 ├─────────────────────────────────────────────────────────┤
-│  client.ts          composition root — câble tout          │
+│  client.ts          composition root — wires everything    │
 └─────────────────────────────────────────────────────────┘
 ```
 
-**Lecture de la règle :** `application` et `infrastructure` connaissent `domain`.
-`domain` ne connaît personne. `client.ts` est le seul point qui connaît tout le
-monde et qui injecte. Conséquence : **zod et fetch sont des détails remplaçables**,
-confinés à `infrastructure/`. Le cœur ne bouge pas si on les change.
+**Reading the rule:** `application` and `infrastructure` know `domain`. `domain`
+knows no one. `client.ts` is the only place that knows everyone and injects.
+Consequence: **zod and fetch are replaceable details**, confined to
+`infrastructure/`. The core does not move if we swap them.
 
-**Décorateurs plutôt qu'héritage** pour le cross-cutting :
-`FetchTransport` → enveloppé par `EtagCache` → enveloppé par `RateLimiter`.
-Chacun a une seule responsabilité et se teste isolément.
+**Decorators over inheritance** for cross-cutting concerns:
+`FetchTransport` → wrapped by `EtagCache` → wrapped by `RateLimiter`.
+Each has a single responsibility and is tested in isolation.
 
-### Arborescence cible
+### Target tree
 
 ```
 src/
   domain/
     player.ts          // types Player, Stats, Game…
-    errors.ts          // ChessComError + sous-types
+    errors.ts          // ChessComError + subtypes
     ports.ts           // HttpTransport, CacheStore (interfaces)
   application/
     resources/
-      player.ts        // logique des endpoints joueur (v1)
+      player.ts        // player endpoint logic (v1)
   infrastructure/
     transport/
       fetch-transport.ts
       rate-limiter.ts
       etag-cache.ts
     schemas/
-      player.ts        // schémas zod + z.infer → types domain
+      player.ts        // zod schemas + z.infer → domain types
   client.ts            // composition root
-  index.ts             // surface publique
+  index.ts             // public surface
 test/
-  fixtures/            // réponses JSON réelles capturées
-  ...                  // un fichier de test miroir par module
+  fixtures/            // real captured JSON responses
+  ...                  // a mirroring test file per module
 ```
 
 ---
 
-## 4. Surface publique (méthodes plates)
+## 4. Public surface (flat methods)
 
 ```ts
 import { ChessComClient } from "@dpianelli/chesscom";
 
 const client = new ChessComClient({
-  userAgent: "myapp/1.0 (me@example.com)", // OBLIGATOIRE
-  fetch,                                    // optionnel (injection test)
-  cache,                                    // optionnel (défaut : Map mémoire)
-  timeout: 10_000,                          // optionnel, ms, par requête
+  userAgent: "myapp/1.0 (me@example.com)", // MANDATORY
+  fetch,                                    // optional (test injection)
+  cache,                                    // optional (default: in-memory Map)
+  timeout: 10_000,                          // optional, ms, per request
   onValidationError: "throw",               // 'throw' | 'warn' | 'ignore'
-  onRateLimit: (info) => {},                // hook d'observabilité
+  onRateLimit: (info) => {},                // observability hook
 });
 
-// --- v1 : univers joueur ---
-client.getPlayer(username);                   // profil
+// --- v1: player surface ---
+client.getPlayer(username);                   // profile
 client.getPlayerStats(username);              // ratings (blitz, rapid, bullet, daily, tactics…)
-client.getPlayerArchives(username);           // liste des mois disponibles
-client.getPlayerGames(username, year, month); // parties d'un mois
-client.streamPlayerGames(username, opts?);    // async iterator (lazy, paginé)
+client.getPlayerArchives(username);           // list of available months
+client.getPlayerGames(username, year, month); // games for one month
+client.streamPlayerGames(username, opts?);    // async iterator (lazy, paginated)
 client.getPlayerClubs(username);
 client.isPlayerOnline(username);
 ```
 
-### `streamPlayerGames` — le helper signature
+### `streamPlayerGames` — the signature helper
 
-Masque la pagination mensuelle. Itère sur les archives, fetch un mois à la fois
-(paresseux), yield partie par partie. Rate-limiter + cache rendent ça poli et rapide
-en re-run.
+Hides monthly pagination. Iterates over the archives, fetches one month at a
+time (lazily), yields game by game. The rate limiter + cache make this both
+polite and fast on re-runs.
 
 ```ts
 for await (const game of client.streamPlayerGames("hikaru", {
@@ -153,70 +154,72 @@ for await (const game of client.streamPlayerGames("hikaru", {
 }
 ```
 
-- **Ordre par défaut** : récent → ancien (cas d'usage le plus courant). Option `order`.
-- **Filtres** : `since` / `until` (par mois `YYYY-MM`), `timeClass`, `rated`.
+- **Default order**: newest → oldest (the most common use case). `order` option.
+- **Filters**: `since` / `until` (by `YYYY-MM` month), `timeClass`, `rated`.
 
-### Endpoints hors v1 (backlog)
+### Out-of-v1 endpoints (backlog)
 
 `getClub`, `getClubMembers`, `getTournament`, `getLeaderboards`,
 `getCountryPlayers`, `getStreamers`, `getDailyPuzzle`.
 
 ---
 
-## 5. Cœur HTTP
+## 5. HTTP core
 
-### Rate-limiter
+### Rate limiter
 
-Règle chess.com : **sérial OK, parallèle → 429** (pas de quota chiffré).
+Chess.com rule: **serial is fine, parallel → 429** (no published numeric quota).
 
-- File FIFO, **concurrence = 1 par défaut**.
-- Backoff exponentiel + jitter sur `429`, respecte l'en-tête `Retry-After`.
-- Hook `onRateLimit` (observabilité, pas une boîte noire).
-- **À trancher à l'implémentation** : limiter partagé par process (clé = hostname)
-  vs par client. Penchant : partagé par défaut, injectable si besoin.
+- FIFO queue, **concurrency = 1 by default**.
+- Exponential backoff + jitter on `429`, honoring the `Retry-After` header.
+- `onRateLimit` hook (observability, not a black box).
+- **Decision**: per-instance, not a process-wide singleton — that would be the
+  implicit global state the design rules forbid. Cross-client coordination is
+  opt-in by sharing a `RateLimiter` instance.
 
-### Cache ETag
+### ETag cache
 
 ```ts
 interface CacheStore {
-  get(key: string): Promise<{ etag: string; body: unknown } | undefined>;
-  set(key: string, value: { etag: string; body: unknown }): Promise<void>;
+  get(key: string): Promise<CacheEntry | undefined>;
+  set(key: string, value: CacheEntry): Promise<void>;
 }
 ```
 
-- Clé = URL de la requête.
-- Envoie `If-None-Match: <etag>`. Sur `304`, renvoie le body caché — **déjà parsé**
-  (on cache l'objet validé, pas le JSON brut → gain de perf).
-- Défaut : `Map` en mémoire. Pluggable (Redis, fichier…).
-- **Pas de TTL** : les archives closes sont immuables ; pour le reste, le serveur
-  décide la fraîcheur via `304`. On ne réinvente pas l'expiration.
+- Key = request URL.
+- Sends `If-None-Match: <etag>`. On `304`, returns the cached body — already
+  parsed (we cache the validated object, not the raw JSON → perf gain).
+- Default: in-memory `Map`. Pluggable (Redis, filesystem, …).
+- **No TTL**: closed archives are immutable; for everything else the server
+  decides freshness via `304`. We do not reinvent expiration.
+- **Best-effort**: a failing store degrades to a miss (read) or a no-op (write)
+  and never turns into a failed request.
 
-### Validation Zod
+### Zod validation
 
-- Chaque réponse passe par un schéma zod **par défaut**.
-- `onValidationError: 'throw' | 'warn' | 'ignore'` (défaut `'throw'`). chess.com
-  n'a pas de versioning d'API → si un champ dérive, l'utilisateur choisit le
-  comportement.
+- Every response runs through a zod schema **by default**.
+- `onValidationError: 'throw' | 'warn' | 'ignore'` (default `'throw'`). Chess.com
+  has no API versioning → if a field drifts, the consumer chooses the behavior.
 
-### Timeout & annulation
+### Timeout & cancellation
 
-- `timeout` par requête via `AbortSignal`.
-- Accepte aussi un `signal` utilisateur.
+- Per-request `timeout` via `AbortSignal`.
+- Also accepts a caller-supplied `signal`.
 
 ---
 
-## 6. Erreurs
+## 6. Errors
 
-Hiérarchie discriminable par `.kind`, `throw` (pas de `Result`).
+Hierarchy discriminable by `.kind`, thrown (no `Result`).
 
 ```
 ChessComError { kind, status?, url }
- ├─ NotFoundError      // 404 (joueur / club inexistant)
- ├─ RateLimitError     // 429 (retries épuisés)
- ├─ ForbiddenError     // 403 (User-Agent manquant / refusé)
- ├─ ServerError        // 5xx
- ├─ ValidationError    // réponse hors schéma zod
- └─ NetworkError       // fetch a throw (offline, timeout)
+ ├─ NotFoundError      // 404 / 410 (missing player / club)
+ ├─ RateLimitError     // 429 (retries exhausted)
+ ├─ ForbiddenError     // 403 (missing / rejected User-Agent)
+ ├─ ServerError        // 5xx / unexpected status
+ ├─ ValidationError    // response outside the zod schema
+ └─ NetworkError       // fetch threw (offline, timeout)
 ```
 
 ```ts
@@ -233,40 +236,44 @@ try {
 
 ## 7. Tests
 
-Stratégie : **mocks de `fetch` + fixtures**, pas de lib de mock réseau.
+Strategy: **fetch mocks + fixtures**, no network-mocking library.
 
-- `ChessComClient` accepte un `fetch` custom → on injecte un fake en test.
-  Cohérent avec « zéro dépendance », teste l'archi par injection (DIP).
-- `test/fixtures/` : réponses JSON réelles capturées une fois (profil, archive,
-  404, 429 + `Retry-After`, 304…).
-- **Ce qu'on teste vraiment (le comportement du cœur, pas juste le parsing)** :
-  - le rate-limiter **sérialise** (2 appels concurrents → exécutés en série) ;
-  - le backoff **respecte `Retry-After`** et réessaie sur 429 ;
-  - le cache renvoie le body sur **304** et envoie `If-None-Match` ;
-  - les **erreurs typées** sont levées (404 → `NotFoundError`, etc.) ;
-  - le **`User-Agent`** est présent dans chaque requête ;
-  - la **validation zod** rejette une fixture corrompue.
-
----
-
-## 8. Qualité & tooling
-
-- **Build** : `tsup` (sorties ESM + CJS, types `.d.ts`).
-- **Tests** : `vitest`.
-- **Lint/format** : `typescript-eslint` strict + Prettier — **bloquants en CI**.
-- **CI** : GitHub Actions (lint, test, build sur push/PR).
-- **Docs** : TSDoc sur toute la surface publique → génération via TypeDoc.
-- **Versioning** : semver. Pas de versioning d'API côté chess.com → les breaking
-  changes du SDK viennent de nous, donc semver strict.
-- Voir `STYLE.md` pour les conventions de code et de nommage.
+- `ChessComClient` accepts a custom `fetch` → we inject a fake in tests.
+  Consistent with "zero dependency"; exercises the architecture via injection (DIP).
+- `test/fixtures/`: real JSON responses captured once (profile, archive, 404,
+  429 + `Retry-After`, 304, …).
+- **What we actually test (core behavior, not just parsing)**:
+  - the rate limiter **serializes** (2 concurrent calls → run in series);
+  - backoff **honors `Retry-After`** and retries on 429;
+  - the cache returns the body on **304** and sends `If-None-Match`;
+  - **typed errors** are thrown (404 → `NotFoundError`, etc.);
+  - the **`User-Agent`** is present on every request;
+  - zod validation rejects a corrupted fixture.
 
 ---
 
-## 9. Statut des décisions
+## 8. Quality & tooling
 
-✅ Toutes les décisions structurantes sont prises (langage, archi, surface, core,
-erreurs, tests, nom). Points laissés explicitement à l'implémentation :
+- **Build**: `tsup` (JS, ESM + CJS) + `tsc` for `.d.ts` (decoupled — TS 6
+  deprecates the `baseUrl` that rollup-plugin-dts injects).
+- **Tests**: `vitest`.
+- **Lint/format**: strict `typescript-eslint` + Prettier — **blocking in CI**.
+- **Git hooks** (husky): pre-commit (lint-staged), commit-msg (commitlint,
+  Conventional Commits), pre-push (typecheck + test).
+- **CI**: GitHub Actions on a Node `[22, 24]` matrix. The dev toolchain requires
+  Node 22+; the published library still targets Node 18+ at runtime.
+- **Docs**: TSDoc across the public surface → TypeDoc generation.
+- **Versioning**: semver. Chess.com has no API versioning → the SDK's breaking
+  changes are ours, so strict semver.
+- See `STYLE.md` for code and naming conventions.
 
-- Rate-limiter partagé par process vs par client.
-- Licence (MIT par défaut).
-- Confirmation finale du username `dpianelli` côté npm (sign-up fait).
+---
+
+## 9. Decision status
+
+✅ All structural decisions are made (language, architecture, surface, core,
+errors, tests, name). Points deliberately left to implementation:
+
+- ETag cache placement: inside the rate limiter (revalidation always hits the
+  network), decided during the core build.
+- Player schemas hand-written from real captures (no OpenAPI spec exists).

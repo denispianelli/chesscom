@@ -20,6 +20,35 @@ function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status });
 }
 
+/** A fetch that routes by URL and records which URLs were requested. */
+function routedFetch(routes: Record<string, unknown>) {
+  const requested: string[] = [];
+  const fn = vi.fn((url: string) => {
+    requested.push(url);
+    return Promise.resolve(url in routes ? json(routes[url]) : json({}, 404));
+  });
+  return { fn: fn as unknown as typeof fetch, requested };
+}
+
+/** A minimal game object that satisfies the schema, with overrides. */
+function makeGame(over: Record<string, unknown> = {}) {
+  return {
+    url: "https://www.chess.com/game/live/1",
+    time_control: "60",
+    end_time: 1,
+    rated: true,
+    time_class: "bullet",
+    rules: "chess",
+    white: { "@id": "a", username: "erik", rating: 1, result: "win" },
+    black: { "@id": "b", username: "opp", rating: 1, result: "resigned" },
+    ...over,
+  };
+}
+
+const ARCHIVES_URL = "https://api.chess.com/pub/player/erik/games/archives";
+const JAN_URL = "https://api.chess.com/pub/player/erik/games/2024/01";
+const FEB_URL = "https://api.chess.com/pub/player/erik/games/2024/02";
+
 afterEach(() => {
   vi.restoreAllMocks();
 });
@@ -86,6 +115,74 @@ describe("ChessComClient.getPlayerGames", () => {
       client.getPlayerGames("erik", 2024, 13),
     ).rejects.toBeInstanceOf(RangeError);
     expect(calls.length).toBe(0);
+  });
+});
+
+describe("ChessComClient.streamPlayerGames", () => {
+  const routes = () => ({
+    [ARCHIVES_URL]: { archives: [JAN_URL, FEB_URL] },
+    [JAN_URL]: {
+      games: [makeGame({ url: "jan-a" }), makeGame({ url: "jan-b" })],
+    },
+    [FEB_URL]: { games: [makeGame({ url: "feb-a" })] },
+  });
+
+  async function collect(stream: AsyncIterable<{ url: string }>) {
+    const urls: string[] = [];
+    for await (const game of stream) urls.push(game.url);
+    return urls;
+  }
+
+  it("yields newest-first across months by default", async () => {
+    const { fn } = routedFetch(routes());
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const urls = await collect(client.streamPlayerGames("erik"));
+
+    expect(urls).toEqual(["feb-a", "jan-b", "jan-a"]);
+  });
+
+  it("yields oldest-first when asked", async () => {
+    const { fn } = routedFetch(routes());
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const urls = await collect(
+      client.streamPlayerGames("erik", { order: "oldest-first" }),
+    );
+
+    expect(urls).toEqual(["jan-a", "jan-b", "feb-a"]);
+  });
+
+  it("only fetches months within the since/until window", async () => {
+    const { fn, requested } = routedFetch(routes());
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const urls = await collect(
+      client.streamPlayerGames("erik", { since: "2024-02" }),
+    );
+
+    expect(urls).toEqual(["feb-a"]);
+    expect(requested).toContain(FEB_URL);
+    expect(requested).not.toContain(JAN_URL);
+  });
+
+  it("applies the timeClass filter", async () => {
+    const { fn } = routedFetch({
+      [ARCHIVES_URL]: { archives: [JAN_URL] },
+      [JAN_URL]: {
+        games: [
+          makeGame({ url: "bullet-1", time_class: "bullet" }),
+          makeGame({ url: "blitz-1", time_class: "blitz" }),
+        ],
+      },
+    });
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const urls = await collect(
+      client.streamPlayerGames("erik", { timeClass: "blitz" }),
+    );
+
+    expect(urls).toEqual(["blitz-1"]);
   });
 });
 

@@ -54,6 +54,20 @@ export interface RequestOptions {
   signal?: AbortSignal;
 }
 
+/** Options for {@link ChessComClient.streamPlayerGames}. */
+export interface StreamGamesOptions extends RequestOptions {
+  /** Only months `>=` this `YYYY-MM` (inclusive). */
+  since?: string;
+  /** Only months `<=` this `YYYY-MM` (inclusive). */
+  until?: string;
+  /** Iteration order. Defaults to `"newest-first"`. */
+  order?: "newest-first" | "oldest-first";
+  /** Keep only games of this time class (`bullet`, `blitz`, …). */
+  timeClass?: string;
+  /** Keep only rated (`true`) or unrated (`false`) games. */
+  rated?: boolean;
+}
+
 /**
  * The SDK entry point and composition root. Wires the transport chain
  * `RateLimiter( EtagCache( FetchTransport ) )` and exposes the player endpoints,
@@ -146,6 +160,55 @@ export class ChessComClient {
     return games;
   }
 
+  /**
+   * Lazily iterate over a player's games across monthly archives, hiding the
+   * pagination. Fetches one month at a time (so the rate limiter and cache
+   * apply per month), yielding game by game. Newest-first by default.
+   *
+   * @example
+   * ```ts
+   * for await (const game of client.streamPlayerGames("hikaru", { since: "2024-01" })) {
+   *   console.log(game.url);
+   * }
+   * ```
+   */
+  async *streamPlayerGames(
+    username: string,
+    options: StreamGamesOptions = {},
+  ): AsyncGenerator<Game> {
+    const { since, until, order = "newest-first", timeClass, rated } = options;
+    const reqOptions = options.signal ? { signal: options.signal } : undefined;
+
+    const { archives } = await this.getPlayerArchives(username, reqOptions);
+    let months = archives
+      .map(parseArchiveMonth)
+      .filter((m): m is ArchiveMonth => m !== undefined);
+    if (since !== undefined) {
+      months = months.filter((m) => m.key >= since);
+    }
+    if (until !== undefined) {
+      months = months.filter((m) => m.key <= until);
+    }
+    if (order === "newest-first") {
+      months.reverse();
+    }
+
+    for (const month of months) {
+      const games = await this.getPlayerGames(
+        username,
+        month.year,
+        month.number,
+        reqOptions,
+      );
+      const ordered = order === "newest-first" ? [...games].reverse() : games;
+      for (const game of ordered) {
+        if (timeClass !== undefined && game.time_class !== timeClass) continue;
+        if (rated !== undefined && game.rated !== rated) continue;
+        yield game;
+      }
+    }
+  }
+
   /** Perform a GET, then validate the body against `schema`. */
   async #get<T>(
     path: string,
@@ -190,4 +253,24 @@ function monthSegment(year: number, month: number): string {
     );
   }
   return `${String(year)}/${String(month).padStart(2, "0")}`;
+}
+
+/** A parsed monthly archive: its year/month and a sortable `YYYY-MM` key. */
+interface ArchiveMonth {
+  readonly year: number;
+  readonly number: number;
+  readonly key: string;
+}
+
+/** Parse `.../games/YYYY/MM` from an archive URL; `undefined` if it doesn't match. */
+function parseArchiveMonth(url: string): ArchiveMonth | undefined {
+  const match = /\/(\d{4})\/(\d{2})$/.exec(url);
+  if (match === null) return undefined;
+  const [, yearStr, monthStr] = match;
+  if (yearStr === undefined || monthStr === undefined) return undefined;
+  return {
+    year: Number(yearStr),
+    number: Number(monthStr),
+    key: `${yearStr}-${monthStr}`,
+  };
 }

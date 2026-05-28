@@ -10,6 +10,7 @@ export {
   ChessComClient,
   type ChessComClientOptions,
   type RequestOptions,
+  type StreamGamesOptions,
   type ValidationErrorMode,
 } from "./client.js";
 

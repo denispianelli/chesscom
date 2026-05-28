@@ -9,11 +9,17 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # 22 = active LTS, 24 = current. The dev toolchain (lint-staged,
+        # commitlint) requires Node >= 22; the published library still runs on
+        # Node >= 18 (see "engines" — it only depends on zod at runtime).
+        node-version: [22, 24]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node-version }}
           cache: npm
       - run: npm ci
       - run: npm run lint

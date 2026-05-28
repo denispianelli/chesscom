@@ -36,5 +36,8 @@ export {
   type RateLimitInfo,
 } from "./infrastructure/transport/rate-limiter.js";
 
+export { EtagCache } from "./infrastructure/transport/etag-cache.js";
+export { MapCacheStore } from "./infrastructure/transport/map-cache-store.js";
+
 /** Package version, kept in sync with package.json at release time. */
 export const VERSION = "0.0.0";

@@ -47,8 +47,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "check": "npm run lint && npm run typecheck && npm run test",
-    "prepublishOnly": "npm run check && npm run build"
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm run test",
+    "prepublishOnly": "npm run check && npm run build",
+    "prepare": "husky"
   },
   "publishConfig": {
     "access": "public"
@@ -57,10 +58,14 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.0.1",
+    "@commitlint/config-conventional": "^21.0.1",
     "@eslint/js": "^10.0.1",
     "@vitest/coverage-v8": "^4.1.7",
     "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.5",
     "prettier": "^3.8.3",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",

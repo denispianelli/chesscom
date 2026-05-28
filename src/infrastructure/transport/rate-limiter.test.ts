@@ -32,9 +32,10 @@ function makeGate(): { promise: Promise<void>; open: () => void } {
 }
 
 /** Inner transport driven by a per-call handler. */
-function transportOf(
-  handler: (callNumber: number) => Promise<HttpResponse>,
-): { transport: HttpTransport; calls: () => number } {
+function transportOf(handler: (callNumber: number) => Promise<HttpResponse>): {
+  transport: HttpTransport;
+  calls: () => number;
+} {
   let n = 0;
   return {
     transport: { request: () => handler(++n) },
@@ -100,7 +101,9 @@ describe("RateLimiter", () => {
   it("retries after a 429 and returns the eventual success", async () => {
     const { transport, calls } = transportOf((n) =>
       n === 1
-        ? Promise.reject(new RateLimitError("429", { url: REQ.url, status: 429 }))
+        ? Promise.reject(
+            new RateLimitError("429", { url: REQ.url, status: 429 }),
+          )
         : Promise.resolve(OK),
     );
     const { sleep } = recordingSleep();
@@ -133,7 +136,9 @@ describe("RateLimiter", () => {
   it("uses exponential backoff with full jitter when no Retry-After", async () => {
     const { transport } = transportOf((n) =>
       n <= 2
-        ? Promise.reject(new RateLimitError("429", { url: REQ.url, status: 429 }))
+        ? Promise.reject(
+            new RateLimitError("429", { url: REQ.url, status: 429 }),
+          )
         : Promise.resolve(OK),
     );
     const { sleep, delays } = recordingSleep();

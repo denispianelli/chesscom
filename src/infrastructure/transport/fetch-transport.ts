@@ -60,7 +60,10 @@ export class FetchTransport implements HttpTransport {
 
     let response: Response;
     try {
-      response = await this.#fetch(req.url, { headers, signal: signal ?? null });
+      response = await this.#fetch(req.url, {
+        headers,
+        signal: signal ?? null,
+      });
     } catch (cause) {
       // A caller-initiated abort is propagated untouched so it stays
       // distinguishable from our own failures.

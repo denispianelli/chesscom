@@ -55,7 +55,9 @@ describe("EtagCache", () => {
     const store = new MapCacheStore();
     await store.set(URL, { etag: '"v1"', body: { name: "hikaru" } });
     const { transport, seen } = transportOf(() =>
-      Promise.resolve(response({ status: 304, etag: undefined, body: undefined })),
+      Promise.resolve(
+        response({ status: 304, etag: undefined, body: undefined }),
+      ),
     );
     const cache = new EtagCache(transport, store);
 

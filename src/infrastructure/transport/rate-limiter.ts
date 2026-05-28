@@ -57,7 +57,9 @@ export class RateLimiter implements HttpTransport {
   constructor(inner: HttpTransport, config: RateLimiterConfig = {}) {
     const concurrency = config.concurrency ?? 1;
     if (concurrency < 1) {
-      throw new RangeError(`concurrency must be >= 1, got ${String(concurrency)}`);
+      throw new RangeError(
+        `concurrency must be >= 1, got ${String(concurrency)}`,
+      );
     }
     this.#inner = inner;
     this.#queue = new Semaphore(concurrency);
@@ -108,7 +110,10 @@ export class RateLimiter implements HttpTransport {
     if (retryAfterMs !== undefined) {
       return retryAfterMs;
     }
-    const ceiling = Math.min(this.#maxDelayMs, this.#baseDelayMs * 2 ** attempt);
+    const ceiling = Math.min(
+      this.#maxDelayMs,
+      this.#baseDelayMs * 2 ** attempt,
+    );
     return Math.round(ceiling * this.#random());
   }
 }

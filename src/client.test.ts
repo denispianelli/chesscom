@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import erikProfile from "../test/fixtures/player-erik.json";
+import erikGames from "../test/fixtures/games-erik-2024-01.json";
 import { ChessComClient } from "./client.js";
 import { NotFoundError, ValidationError } from "./domain/errors.js";
 
@@ -60,6 +61,31 @@ describe("ChessComClient.getPlayer", () => {
     await expect(client.getPlayer("ghost")).rejects.toBeInstanceOf(
       NotFoundError,
     );
+  });
+});
+
+describe("ChessComClient.getPlayerGames", () => {
+  it("builds a zero-padded month URL and returns the unwrapped games array", async () => {
+    const { fn, calls } = mockFetch(() => json(erikGames));
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const result = await client.getPlayerGames("erik", 2024, 1);
+
+    expect(calls[0]?.url).toBe(
+      "https://api.chess.com/pub/player/erik/games/2024/01",
+    );
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBe(erikGames.games.length);
+  });
+
+  it("rejects an out-of-range month before making a request", async () => {
+    const { fn, calls } = mockFetch(() => json(erikGames));
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    await expect(
+      client.getPlayerGames("erik", 2024, 13),
+    ).rejects.toBeInstanceOf(RangeError);
+    expect(calls.length).toBe(0);
   });
 });
 

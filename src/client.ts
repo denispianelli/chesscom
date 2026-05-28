@@ -16,6 +16,10 @@ import {
   type PlayerProfile,
   type PlayerStats,
 } from "./infrastructure/schemas/player.js";
+import {
+  monthlyGamesSchema,
+  type Game,
+} from "./infrastructure/schemas/game.js";
 
 const DEFAULT_BASE_URL = "https://api.chess.com/pub";
 
@@ -126,6 +130,22 @@ export class ChessComClient {
     );
   }
 
+  /**
+   * Fetch all of a player's games for a given month. `month` is 1-12; the API's
+   * zero-padding is handled for you. Returns the games directly (the API's
+   * `{ games }` wrapper is unwrapped).
+   */
+  async getPlayerGames(
+    username: string,
+    year: number,
+    month: number,
+    options?: RequestOptions,
+  ): Promise<Game[]> {
+    const path = `/player/${encodeURIComponent(username)}/games/${monthSegment(year, month)}`;
+    const { games } = await this.#get(path, monthlyGamesSchema, options);
+    return games;
+  }
+
   /** Perform a GET, then validate the body against `schema`. */
   async #get<T>(
     path: string,
@@ -160,4 +180,14 @@ export class ChessComClient {
     }
     return body as T;
   }
+}
+
+/** Build the `YYYY/MM` path segment, validating and zero-padding the month. */
+function monthSegment(year: number, month: number): string {
+  if (!Number.isInteger(month) || month < 1 || month > 12) {
+    throw new RangeError(
+      `month must be an integer in 1-12, got ${String(month)}`,
+    );
+  }
+  return `${String(year)}/${String(month).padStart(2, "0")}`;
 }

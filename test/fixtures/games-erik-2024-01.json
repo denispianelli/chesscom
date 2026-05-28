@@ -1,0 +1,64 @@
+{
+  "games": [
+    {
+      "url": "https://www.chess.com/game/live/97878070965",
+      "pgn": "[Event \"Live Chess\"]\n[Site \"Chess.com\"]\n[Date \"2024.01.01\"]\n[Round \"-\"]\n[White \"erik\"]\n[Black \"bartekbartek45455\"]\n[Result \"1-0\"]\n[CurrentPosition \"r2q1r2/pp3kp1/5p2/3N2nQ/8/6P1/PPP5/2KR3R b - -\"]\n[Timezone \"UTC\"]\n[ECO \"B24\"]\n[ECOUrl \"https://www.chess.com/openings/Closed-Sicilian-Defense-Fianchetto-Variation...6.exd5-exd5-7.d4-cxd4-8.Nxd4\"]\n[UTCDate \"2024.01.01\"]\n[UTCTime \"19:58:17\"]\n[WhiteElo \"1699\"]\n[BlackElo \"1675\"]\n[TimeControl \"60+1\"]\n[Termination \"erik won on time\"]\n[StartTime \"19:58:17\"]\n[EndDate \"2024.01.01\"]\n[EndTime \"20:00:43\"]\n[Link \"https://www.chess.com/game/live/97878070965\"]\n\n1. e4 {[%clk 0:01:01]} 1... c5 {[%clk 0:01:01]} 2. Nc3 {[%clk 0:01:01.3]} 2... e6 {[%clk 0:01:01.3]} 3. g3 {[%clk 0:01:02]} 3... d5 {[%clk 0:01:00.1]} 4. exd5 {[%clk 0:01:02.3]} 4... exd5 {[%clk 0:01:01]} 5. Bg2 {[%clk 0:01:03]} 5... Nf6 {[%clk 0:00:59.8]} 6. Nf3 {[%clk 0:01:01.9]} 6... Nc6 {[%clk 0:00:59.8]} 7. d4 {[%clk 0:01:01.3]} 7... cxd4 {[%clk 0:00:59.8]} 8. Nxd4 {[%clk 0:01:02.2]} 8... Nxd4 {[%clk 0:01:00]} 9. Qxd4 {[%clk 0:01:03.1]} 9... Be6 {[%clk 0:00:56]} 10. Bg5 {[%clk 0:01:02.4]} 10... Be7 {[%clk 0:00:55.5]} 11. O-O-O {[%clk 0:01:00.1]} 11... O-O {[%clk 0:00:54.7]} 12. h4 {[%clk 0:00:54.7]} 12... h6 {[%clk 0:00:54.1]} 13. f4 {[%clk 0:00:51.7]} 13... hxg5 {[%clk 0:00:49.5]} 14. hxg5 {[%clk 0:00:52.6]} 14... Nh7 {[%clk 0:00:48.9]} 15. Bxd5 {[%clk 0:00:39.1]} 15... Bxd5 {[%clk 0:00:44.3]} 16. Nxd5 {[%clk 0:00:40]} 16... Bxg5 {[%clk 0:00:03.7]} 17. fxg5 {[%clk 0:00:35.6]} 17... Nxg5 {[%clk 0:00:03.4]} 18. Qh4 {[%clk 0:00:31.2]} 18... f6 {[%clk 0:00:02.3]} 19. Qh8+ {[%clk 0:00:24.7]} 19... Kf7 {[%clk 0:00:02.3]} 20. Qh5+ {[%clk 0:00:23.7]} 1-0\n",
+      "time_control": "60+1",
+      "end_time": 1704139243,
+      "rated": true,
+      "accuracies": {
+        "white": 85.24,
+        "black": 74.33
+      },
+      "tcn": "mCYIbs0SowZJCJSJfo!Tgv5QlBIBvBQBdB6ScM90ec8!pF3VnDVMFMT3oJSJsJ0MDM3MBF1TF?!1?N",
+      "uuid": "1b94ef29-a8e0-11ee-8c7e-6cfe544c0428",
+      "initial_setup": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "fen": "r2q1r2/pp3kp1/5p2/3N2nQ/8/6P1/PPP5/2KR3R b - -",
+      "time_class": "bullet",
+      "rules": "chess",
+      "white": {
+        "rating": 1699,
+        "result": "win",
+        "@id": "https://api.chess.com/pub/player/erik",
+        "username": "erik",
+        "uuid": "fe696c00-fcba-11db-8029-000000000000"
+      },
+      "black": {
+        "rating": 1675,
+        "result": "timeout",
+        "@id": "https://api.chess.com/pub/player/bartekbartek45455",
+        "username": "bartekbartek45455",
+        "uuid": "a318205e-6116-11ed-af24-75e0b4cf3d91"
+      },
+      "eco": "https://www.chess.com/openings/Closed-Sicilian-Defense-Fianchetto-Variation...6.exd5-exd5-7.d4-cxd4-8.Nxd4"
+    },
+    {
+      "url": "https://www.chess.com/game/live/97878561855",
+      "pgn": "[Event \"Live Chess\"]\n[Site \"Chess.com\"]\n[Date \"2024.01.01\"]\n[Round \"-\"]\n[White \"alessandrocucchi6\"]\n[Black \"erik\"]\n[Result \"0-1\"]\n[CurrentPosition \"6k1/2p1q3/1pQp2bp/p2P2p1/P2bP3/2N3B1/1P4PP/5r1K w - -\"]\n[Timezone \"UTC\"]\n[ECO \"E61\"]\n[ECOUrl \"https://www.chess.com/openings/Kings-Indian-Defense-Smyslov-Variation-4...d6\"]\n[UTCDate \"2024.01.01\"]\n[UTCTime \"20:03:07\"]\n[WhiteElo \"1595\"]\n[BlackElo \"1705\"]\n[TimeControl \"60+1\"]\n[Termination \"erik won by checkmate\"]\n[StartTime \"20:03:07\"]\n[EndDate \"2024.01.01\"]\n[EndTime \"20:05:51\"]\n[Link \"https://www.chess.com/game/live/97878561855\"]\n\n1. d4 {[%clk 0:01:01]} 1... d6 {[%clk 0:01:01]} 2. c4 {[%clk 0:01:01.9]} 2... Nf6 {[%clk 0:01:01.4]} 3. Nc3 {[%clk 0:01:02.8]} 3... g6 {[%clk 0:01:01.4]} 4. Bg5 {[%clk 0:01:03.1]} 4... Bg7 {[%clk 0:01:01.7]} 5. Qd2 {[%clk 0:01:03.7]} 5... h6 {[%clk 0:01:00.2]} 6. Bh4 {[%clk 0:01:02.3]} 6... g5 {[%clk 0:01:00.2]} 7. Bg3 {[%clk 0:01:02.5]} 7... Bf5 {[%clk 0:01:00]} 8. f3 {[%clk 0:00:58.3]} 8... Nc6 {[%clk 0:00:56.8]} 9. e4 {[%clk 0:00:55.1]} 9... Bg6 {[%clk 0:00:57]} 10. Bd3 {[%clk 0:00:54]} 10... e5 {[%clk 0:00:56.7]} 11. dxe5 {[%clk 0:00:51.3]} 11... Nxe5 {[%clk 0:00:55.4]} 12. Nge2 {[%clk 0:00:48.8]} 12... Nxd3+ {[%clk 0:00:55]} 13. Qxd3 {[%clk 0:00:48.8]} 13... Qd7 {[%clk 0:00:52.5]} 14. Nd5 {[%clk 0:00:47.6]} 14... Nxd5 {[%clk 0:00:51.5]} 15. cxd5 {[%clk 0:00:48.5]} 15... O-O {[%clk 0:00:29.2]} 16. Rb1 {[%clk 0:00:44.5]} 16... f5 {[%clk 0:00:29.4]} 17. O-O {[%clk 0:00:42.2]} 17... fxe4 {[%clk 0:00:29.6]} 18. fxe4 {[%clk 0:00:42.1]} 18... Rae8 {[%clk 0:00:29.3]} 19. Nc3 {[%clk 0:00:36.2]} 19... Qe7 {[%clk 0:00:26]} 20. Rxf8+ {[%clk 0:00:32.4]} 20... Bxf8 {[%clk 0:00:26.9]} 21. Re1 {[%clk 0:00:19.2]} 21... Bg7 {[%clk 0:00:26.7]} 22. Qb5 {[%clk 0:00:09.3]} 22... b6 {[%clk 0:00:24.7]} 23. a4 {[%clk 0:00:03.9]} 23... a5 {[%clk 0:00:23.3]} 24. Qc6 {[%clk 0:00:03.4]} 24... Rf8 {[%clk 0:00:20.8]} 25. Rf1 {[%clk 0:00:03.1]} 25... Bd4+ {[%clk 0:00:19.9]} 26. Kh1 {[%clk 0:00:03]} 26... Rxf1# {[%clk 0:00:18.5]} 0-1\n",
+      "time_control": "60+1",
+      "end_time": 1704139551,
+      "rated": true,
+      "tcn": "lBZRkA!Tbs2UcM92dl3VMFUMFw6Lnv5QmCLUft0KBKQKgmKtlt7ZsJTJAJ8!ab1LegLCvC48msZ0f929be92tHXPiyWGHQ89ef2Bgh9f",
+      "uuid": "c78903b7-a8e0-11ee-8c7e-6cfe544c0428",
+      "initial_setup": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "fen": "6k1/2p1q3/1pQp2bp/p2P2p1/P2bP3/2N3B1/1P4PP/5r1K w - -",
+      "time_class": "bullet",
+      "rules": "chess",
+      "white": {
+        "rating": 1595,
+        "result": "checkmated",
+        "@id": "https://api.chess.com/pub/player/alessandrocucchi6",
+        "username": "alessandrocucchi6",
+        "uuid": "6b1e5526-694c-11ee-ac3e-5383ab8dda8b"
+      },
+      "black": {
+        "rating": 1705,
+        "result": "win",
+        "@id": "https://api.chess.com/pub/player/erik",
+        "username": "erik",
+        "uuid": "fe696c00-fcba-11db-8029-000000000000"
+      },
+      "eco": "https://www.chess.com/openings/Kings-Indian-Defense-Smyslov-Variation-4...d6"
+    }
+  ]
+}

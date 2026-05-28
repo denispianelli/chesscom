@@ -52,5 +52,11 @@ export type {
   PlayerArchives,
 } from "./infrastructure/schemas/player.js";
 
+export type {
+  Game,
+  GamePlayer,
+  MonthlyGames,
+} from "./infrastructure/schemas/game.js";
+
 /** Package version, kept in sync with package.json at release time. */
 export const VERSION = "0.0.0";

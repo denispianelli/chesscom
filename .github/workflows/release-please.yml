@@ -13,3 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: googleapis/release-please-action@v4
+        with:
+          # A fine-grained PAT (not the default GITHUB_TOKEN) so the release PR's
+          # events trigger CI — GITHUB_TOKEN-driven events are suppressed by
+          # GitHub's anti-recursion rule.
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}

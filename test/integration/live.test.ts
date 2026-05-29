@@ -106,6 +106,23 @@ describe("live: global", () => {
   });
 });
 
+describe("live: matches", () => {
+  it("getPlayerMatches", async () => {
+    expect(await client.getPlayerMatches("erik")).toBeTypeOf("object");
+  });
+
+  it("getClubMatches", async () => {
+    expect(await client.getClubMatches("team-usa")).toBeTypeOf("object");
+  });
+
+  it("getMatch + getMatchBoard", async () => {
+    const m = await client.getMatch(642370);
+    expect(m.teams.team1.players.length).toBeGreaterThan(0);
+    const board = await client.getMatchBoard(642370, 29);
+    expect(Array.isArray(board.games)).toBe(true);
+  });
+});
+
 describe("live: errors", () => {
   it("throws NotFoundError for a non-existent player", async () => {
     await expect(

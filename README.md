@@ -75,6 +75,10 @@ All methods return validated, fully typed results.
 | `getCountry(iso)`                       | `Country`              | `/country/{iso}`                       |
 | `getCountryPlayers(iso)`                | `string[]`             | `/country/{iso}/players`               |
 | `getCountryClubs(iso)`                  | `string[]`             | `/country/{iso}/clubs`                 |
+| `getPlayerMatches(username)`            | `PlayerMatches`        | `/player/{username}/matches`           |
+| `getClubMatches(urlId)`                 | `ClubMatches`          | `/club/{url-id}/matches`               |
+| `getMatch(id)`                          | `Match`                | `/match/{id}`                          |
+| `getMatchBoard(id, board)`              | `MatchBoard`           | `/match/{id}/{board}`                  |
 
 Each method also accepts a final options object with an `AbortSignal`:
 

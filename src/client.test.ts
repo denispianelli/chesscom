@@ -12,6 +12,10 @@ import puzzle from "../test/fixtures/puzzle.json";
 import country from "../test/fixtures/country.json";
 import countryPlayers from "../test/fixtures/country-players.json";
 import countryClubs from "../test/fixtures/country-clubs.json";
+import match from "../test/fixtures/match.json";
+import matchBoard from "../test/fixtures/match-board.json";
+import playerMatches from "../test/fixtures/player-matches-erik.json";
+import clubMatches from "../test/fixtures/club-matches-team-usa.json";
 import { ChessComClient } from "./client.js";
 import { NotFoundError, ValidationError } from "./domain/errors.js";
 
@@ -321,6 +325,48 @@ describe("ChessComClient global endpoints", () => {
     expect(profile.code).toBe(country.code);
     expect(players).toEqual(countryPlayers.players);
     expect(clubs).toEqual(countryClubs.clubs);
+  });
+});
+
+describe("ChessComClient matches", () => {
+  it("getPlayerMatches builds the URL and returns grouped matches", async () => {
+    const { fn, calls } = mockFetch(() => json(playerMatches));
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const m = await client.getPlayerMatches("erik");
+
+    expect(calls[0]?.url).toBe("https://api.chess.com/pub/player/erik/matches");
+    expect(Array.isArray(m.finished)).toBe(true);
+  });
+
+  it("getClubMatches builds the URL", async () => {
+    const { fn, calls } = mockFetch(() => json(clubMatches));
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    await client.getClubMatches("team-usa");
+
+    expect(calls[0]?.url).toBe(
+      "https://api.chess.com/pub/club/team-usa/matches",
+    );
+  });
+
+  it("getMatch builds the URL and returns the match", async () => {
+    const { fn, calls } = mockFetch(() => json(match));
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const m = await client.getMatch(642370);
+
+    expect(calls[0]?.url).toBe("https://api.chess.com/pub/match/642370");
+    expect(m.name).toBe(match.name);
+  });
+
+  it("getMatchBoard builds the id/board URL", async () => {
+    const { fn, calls } = mockFetch(() => json(matchBoard));
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    await client.getMatchBoard(642370, 29);
+
+    expect(calls[0]?.url).toBe("https://api.chess.com/pub/match/642370/29");
   });
 });
 

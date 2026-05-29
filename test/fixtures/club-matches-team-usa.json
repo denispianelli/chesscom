@@ -1,0 +1,45 @@
+{
+  "finished": [
+    {
+      "name": "WCGC 2025 R6: Team France vs Team  USA",
+      "@id": "https://api.chess.com/pub/match/1873791",
+      "opponent": "https://api.chess.com/pub/club/team-france",
+      "start_time": 1764576243,
+      "time_class": "daily",
+      "result": "win"
+    },
+    {
+      "name": "PANAM2025 R3: Team Canada vs. Team USA",
+      "@id": "https://api.chess.com/pub/match/1871039",
+      "opponent": "https://api.chess.com/pub/club/team-canada",
+      "start_time": 1763258642,
+      "time_class": "daily",
+      "result": "win"
+    }
+  ],
+  "in_progress": [
+    {
+      "name": "WL2025 R9: Team Slovakia vs Team USA",
+      "@id": "https://api.chess.com/pub/match/1838312",
+      "opponent": "https://api.chess.com/pub/club/team-slovakia",
+      "start_time": 1757952182,
+      "time_class": "daily"
+    },
+    {
+      "name": "WCGC 2025 R2 and PANAM2025 R1: Team USA vs Team Argentina",
+      "@id": "https://api.chess.com/pub/match/1847347",
+      "opponent": "https://api.chess.com/pub/club/team-argentina",
+      "start_time": 1759334583,
+      "time_class": "daily"
+    }
+  ],
+  "registered": [
+    {
+      "name": "Chess 960 WL2026 R5: Team England vs Team  USA",
+      "@id": "https://api.chess.com/pub/match/1950779",
+      "opponent": "https://api.chess.com/pub/club/team-england",
+      "start_time": 1780243200,
+      "time_class": "daily"
+    }
+  ]
+}

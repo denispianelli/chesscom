@@ -21,3 +21,7 @@ export const countryClubsSchema = z.object({
 
 /** A country profile. */
 export type Country = z.infer<typeof countrySchema>;
+/** The `{ players }` wrapper for a country's players. */
+export type CountryPlayers = z.infer<typeof countryPlayersSchema>;
+/** The `{ clubs }` wrapper for a country's clubs. */
+export type CountryClubs = z.infer<typeof countryClubsSchema>;

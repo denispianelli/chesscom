@@ -50,6 +50,7 @@ export { MapCacheStore } from "./infrastructure/transport/map-cache-store.js";
 export type {
   PlayerProfile,
   PlayerStats,
+  PlayerArchives,
 } from "./infrastructure/schemas/player.js";
 
 export type {
@@ -87,7 +88,11 @@ export type {
 
 export type { Puzzle } from "./infrastructure/schemas/puzzle.js";
 
-export type { Country } from "./infrastructure/schemas/country.js";
+export type {
+  Country,
+  CountryPlayers,
+  CountryClubs,
+} from "./infrastructure/schemas/country.js";
 
 /**
  * Package version. Replaced at build time by tsup's `define` with the value

@@ -48,6 +48,16 @@ import {
   countrySchema,
   type Country,
 } from "./infrastructure/schemas/country.js";
+import {
+  clubMatchesSchema,
+  matchBoardSchema,
+  matchSchema,
+  playerMatchesSchema,
+  type ClubMatches,
+  type Match,
+  type MatchBoard,
+  type PlayerMatches,
+} from "./infrastructure/schemas/match.js";
 
 const DEFAULT_BASE_URL = "https://api.chess.com/pub";
 
@@ -351,6 +361,52 @@ export class ChessComClient {
       options,
     );
     return clubs;
+  }
+
+  /** Fetch a player's team matches, grouped by state. */
+  getPlayerMatches(
+    username: string,
+    options?: RequestOptions,
+  ): Promise<PlayerMatches> {
+    return this.#get(
+      `/player/${encodeURIComponent(username)}/matches`,
+      playerMatchesSchema,
+      options,
+    );
+  }
+
+  /** Fetch a club's team matches, grouped by state. */
+  getClubMatches(
+    urlId: string,
+    options?: RequestOptions,
+  ): Promise<ClubMatches> {
+    return this.#get(
+      `/club/${encodeURIComponent(urlId)}/matches`,
+      clubMatchesSchema,
+      options,
+    );
+  }
+
+  /** Fetch a team match by its id. */
+  getMatch(id: number | string, options?: RequestOptions): Promise<Match> {
+    return this.#get(
+      `/match/${encodeURIComponent(String(id))}`,
+      matchSchema,
+      options,
+    );
+  }
+
+  /** Fetch a single board of a team match. */
+  getMatchBoard(
+    id: number | string,
+    board: number | string,
+    options?: RequestOptions,
+  ): Promise<MatchBoard> {
+    return this.#get(
+      `/match/${encodeURIComponent(String(id))}/${encodeURIComponent(String(board))}`,
+      matchBoardSchema,
+      options,
+    );
   }
 
   /** Perform a GET, then validate the body against `schema`. */

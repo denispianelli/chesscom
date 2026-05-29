@@ -94,6 +94,18 @@ export type {
   CountryClubs,
 } from "./infrastructure/schemas/country.js";
 
+export type {
+  Match,
+  MatchTeam,
+  MatchTeamPlayer,
+  MatchSettings,
+  MatchBoard,
+  PlayerMatches,
+  PlayerMatchEntry,
+  ClubMatches,
+  ClubMatchEntry,
+} from "./infrastructure/schemas/match.js";
+
 /**
  * Package version. Replaced at build time by tsup's `define` with the value
  * from package.json, so it never drifts from the published version. The `typeof`

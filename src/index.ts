@@ -74,5 +74,12 @@ export type {
   PlayerTournaments,
 } from "./infrastructure/schemas/tournament.js";
 
-/** Package version, kept in sync with package.json at release time. */
-export const VERSION = "0.0.0";
+/**
+ * Package version. Replaced at build time by tsup's `define` with the value
+ * from package.json, so it never drifts from the published version. The `typeof`
+ * guard keeps the source runnable without that build step (e.g. under vitest),
+ * where the token is undefined — avoiding a `ReferenceError`.
+ */
+declare const __VERSION__: string | undefined;
+export const VERSION: string =
+  typeof __VERSION__ === "string" ? __VERSION__ : "0.0.0-dev";

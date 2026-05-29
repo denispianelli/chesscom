@@ -82,6 +82,30 @@ describe("live: tournaments", () => {
   });
 });
 
+describe("live: global", () => {
+  it("getLeaderboards", async () => {
+    const lb = await client.getLeaderboards();
+    expect((lb.live_blitz?.length ?? 0) > 0).toBe(true);
+  });
+
+  it("getStreamers", async () => {
+    const streamers = await client.getStreamers();
+    expect(Array.isArray(streamers)).toBe(true);
+  });
+
+  it("getDailyPuzzle", async () => {
+    const puzzle = await client.getDailyPuzzle();
+    expect(puzzle.fen).toBeTypeOf("string");
+  });
+
+  it("getCountry + players + clubs", async () => {
+    const country = await client.getCountry("IS");
+    expect(country.code).toBe("IS");
+    expect(Array.isArray(await client.getCountryPlayers("IS"))).toBe(true);
+    expect(Array.isArray(await client.getCountryClubs("IS"))).toBe(true);
+  });
+});
+
 describe("live: errors", () => {
   it("throws NotFoundError for a non-existent player", async () => {
     await expect(

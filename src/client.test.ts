@@ -6,6 +6,12 @@ import clubMembers from "../test/fixtures/club-members-team-usa.json";
 import playerClubs from "../test/fixtures/player-clubs-erik.json";
 import tournament from "../test/fixtures/tournament.json";
 import playerTournaments from "../test/fixtures/player-tournaments-erik.json";
+import leaderboards from "../test/fixtures/leaderboards.json";
+import streamers from "../test/fixtures/streamers.json";
+import puzzle from "../test/fixtures/puzzle.json";
+import country from "../test/fixtures/country.json";
+import countryPlayers from "../test/fixtures/country-players.json";
+import countryClubs from "../test/fixtures/country-clubs.json";
 import { ChessComClient } from "./client.js";
 import { NotFoundError, ValidationError } from "./domain/errors.js";
 
@@ -264,6 +270,57 @@ describe("ChessComClient tournaments", () => {
     const result = await client.getPlayerTournaments("erik");
 
     expect(result.finished?.length).toBe(playerTournaments.finished.length);
+  });
+});
+
+describe("ChessComClient global endpoints", () => {
+  it("getLeaderboards builds the URL and returns the boards", async () => {
+    const { fn, calls } = mockFetch(() => json(leaderboards));
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const lb = await client.getLeaderboards();
+
+    expect(calls[0]?.url).toBe("https://api.chess.com/pub/leaderboards");
+    expect((lb.live_blitz?.length ?? 0) > 0).toBe(true);
+  });
+
+  it("getStreamers unwraps to an array", async () => {
+    const { fn } = mockFetch(() => json(streamers));
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const list = await client.getStreamers();
+
+    expect(Array.isArray(list)).toBe(true);
+    expect(list.length).toBe(streamers.streamers.length);
+  });
+
+  it("getDailyPuzzle and getRandomPuzzle hit the right URLs", async () => {
+    const { fn, calls } = mockFetch(() => json(puzzle));
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    await client.getDailyPuzzle();
+    await client.getRandomPuzzle();
+
+    expect(calls[0]?.url).toBe("https://api.chess.com/pub/puzzle");
+    expect(calls[1]?.url).toBe("https://api.chess.com/pub/puzzle/random");
+  });
+
+  it("country profile, players, and clubs", async () => {
+    const { fn, calls } = mockFetch((url) => {
+      if (url.endsWith("/players")) return json(countryPlayers);
+      if (url.endsWith("/clubs")) return json(countryClubs);
+      return json(country);
+    });
+    const client = new ChessComClient({ userAgent: UA, fetch: fn });
+
+    const profile = await client.getCountry("IS");
+    const players = await client.getCountryPlayers("IS");
+    const clubs = await client.getCountryClubs("IS");
+
+    expect(calls[0]?.url).toBe("https://api.chess.com/pub/country/IS");
+    expect(profile.code).toBe(country.code);
+    expect(players).toEqual(countryPlayers.players);
+    expect(clubs).toEqual(countryClubs.clubs);
   });
 });
 

@@ -1,0 +1,4 @@
+# Generated artifacts — not ours to format.
+dist
+coverage
+CHANGELOG.md

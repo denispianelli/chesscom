@@ -33,6 +33,21 @@ import {
   type PlayerTournaments,
   type Tournament,
 } from "./infrastructure/schemas/tournament.js";
+import {
+  leaderboardsSchema,
+  type Leaderboards,
+} from "./infrastructure/schemas/leaderboards.js";
+import {
+  streamersSchema,
+  type Streamer,
+} from "./infrastructure/schemas/streamer.js";
+import { puzzleSchema, type Puzzle } from "./infrastructure/schemas/puzzle.js";
+import {
+  countryClubsSchema,
+  countryPlayersSchema,
+  countrySchema,
+  type Country,
+} from "./infrastructure/schemas/country.js";
 
 const DEFAULT_BASE_URL = "https://api.chess.com/pub";
 
@@ -276,6 +291,66 @@ export class ChessComClient {
       playerTournamentsSchema,
       options,
     );
+  }
+
+  /** Fetch the global leaderboards. */
+  getLeaderboards(options?: RequestOptions): Promise<Leaderboards> {
+    return this.#get("/leaderboards", leaderboardsSchema, options);
+  }
+
+  /** Fetch the list of Chess.com streamers. */
+  async getStreamers(options?: RequestOptions): Promise<Streamer[]> {
+    const { streamers } = await this.#get(
+      "/streamers",
+      streamersSchema,
+      options,
+    );
+    return streamers;
+  }
+
+  /** Fetch the daily puzzle. */
+  getDailyPuzzle(options?: RequestOptions): Promise<Puzzle> {
+    return this.#get("/puzzle", puzzleSchema, options);
+  }
+
+  /** Fetch a random puzzle. */
+  getRandomPuzzle(options?: RequestOptions): Promise<Puzzle> {
+    return this.#get("/puzzle/random", puzzleSchema, options);
+  }
+
+  /** Fetch a country's profile by its ISO 3166 code (e.g. `"US"`). */
+  getCountry(iso: string, options?: RequestOptions): Promise<Country> {
+    return this.#get(
+      `/country/${encodeURIComponent(iso)}`,
+      countrySchema,
+      options,
+    );
+  }
+
+  /** Fetch the usernames of players from a country. */
+  async getCountryPlayers(
+    iso: string,
+    options?: RequestOptions,
+  ): Promise<string[]> {
+    const { players } = await this.#get(
+      `/country/${encodeURIComponent(iso)}/players`,
+      countryPlayersSchema,
+      options,
+    );
+    return players;
+  }
+
+  /** Fetch the club URLs from a country. */
+  async getCountryClubs(
+    iso: string,
+    options?: RequestOptions,
+  ): Promise<string[]> {
+    const { clubs } = await this.#get(
+      `/country/${encodeURIComponent(iso)}/clubs`,
+      countryClubsSchema,
+      options,
+    );
+    return clubs;
   }
 
   /** Perform a GET, then validate the body against `schema`. */

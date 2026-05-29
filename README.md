@@ -68,6 +68,13 @@ All methods return validated, fully typed results.
 | `getClub(urlId)`                        | `ClubProfile`          | `/club/{url-id}`                       |
 | `getClubMembers(urlId)`                 | `ClubMembers`          | `/club/{url-id}/members`               |
 | `getTournament(urlId)`                  | `Tournament`           | `/tournament/{url-id}`                 |
+| `getLeaderboards()`                     | `Leaderboards`         | `/leaderboards`                        |
+| `getStreamers()`                        | `Streamer[]`           | `/streamers`                           |
+| `getDailyPuzzle()`                      | `Puzzle`               | `/puzzle`                              |
+| `getRandomPuzzle()`                     | `Puzzle`               | `/puzzle/random`                       |
+| `getCountry(iso)`                       | `Country`              | `/country/{iso}`                       |
+| `getCountryPlayers(iso)`                | `string[]`             | `/country/{iso}/players`               |
+| `getCountryClubs(iso)`                  | `string[]`             | `/country/{iso}/clubs`                 |
 
 Each method also accepts a final options object with an `AbortSignal`:
 
@@ -95,6 +102,29 @@ for await (const game of client.streamPlayerGames("hikaru", {
 ```
 
 Months outside the `since`/`until` window are never requested.
+
+### Parsing PGN
+
+Games expose their **raw PGN** as a string — this SDK does not parse moves, so you
+can pair it with whatever chess library you prefer. For example, with
+[chess.js](https://github.com/jhlywa/chess.js):
+
+```ts
+import { Chess } from "chess.js";
+
+const games = await client.getPlayerGames("hikaru", 2024, 1);
+const game = games[0];
+
+if (game?.pgn) {
+  const chess = new Chess();
+  chess.loadPgn(game.pgn);
+  console.log(chess.history()); // ["e4", "c5", "Nf3", …]
+  console.log(chess.header()); // { White, Black, Result, ECO, … }
+}
+```
+
+(Header fields like `white`, `black`, `time_control`, `eco`, and `end_time` are
+also available as structured fields on the `Game` object, no parsing needed.)
 
 ## Configuration
 

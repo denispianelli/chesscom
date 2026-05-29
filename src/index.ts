@@ -50,6 +50,7 @@ export { MapCacheStore } from "./infrastructure/transport/map-cache-store.js";
 export type {
   PlayerProfile,
   PlayerStats,
+  PlayerArchives,
 } from "./infrastructure/schemas/player.js";
 
 export type {
@@ -73,6 +74,25 @@ export type {
   PlayerTournamentEntry,
   PlayerTournaments,
 } from "./infrastructure/schemas/tournament.js";
+
+export type {
+  Leaderboards,
+  LeaderboardEntry,
+} from "./infrastructure/schemas/leaderboards.js";
+
+export type {
+  Streamer,
+  StreamerPlatform,
+  Streamers,
+} from "./infrastructure/schemas/streamer.js";
+
+export type { Puzzle } from "./infrastructure/schemas/puzzle.js";
+
+export type {
+  Country,
+  CountryPlayers,
+  CountryClubs,
+} from "./infrastructure/schemas/country.js";
 
 /**
  * Package version. Replaced at build time by tsup's `define` with the value

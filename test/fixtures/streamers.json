@@ -1,0 +1,60 @@
+{
+  "streamers": [
+    {
+      "username": "masruri_rahman",
+      "avatar": "https://images.chesscomfiles.com/uploads/v1/user/10799404.738495d4.50x50o.5a4b075ce6cd.jpg",
+      "twitch_url": "https://www.youtube.com/watch?v=bHduRvyx0rM",
+      "url": "https://www.chess.com/member/masruri_rahman",
+      "is_live": true,
+      "is_community_streamer": false,
+      "platforms": [
+        {
+          "type": "twitch",
+          "channel_url": "https://twitch.tv/rlchessreal",
+          "is_live": false
+        },
+        {
+          "type": "youtube",
+          "stream_url": "https://www.youtube.com/watch?v=bHduRvyx0rM",
+          "channel_url": "https://youtube.com/@rlchess",
+          "is_live": true,
+          "is_main_live_platform": true
+        }
+      ]
+    },
+    {
+      "username": "Oleksandr_Bortnyk",
+      "avatar": "https://images.chesscomfiles.com/uploads/v1/user/28168290.451f25f9.50x50o.4b5beea810d5.jpg",
+      "twitch_url": "https://twitch.tv/bortnykchess",
+      "url": "https://www.chess.com/member/Oleksandr_Bortnyk",
+      "is_live": true,
+      "is_community_streamer": false,
+      "platforms": [
+        {
+          "type": "twitch",
+          "stream_url": "https://twitch.tv/bortnykchess",
+          "channel_url": "https://twitch.tv/bortnykchess",
+          "is_live": true,
+          "is_main_live_platform": true
+        }
+      ]
+    },
+    {
+      "username": "UncleJessi",
+      "avatar": "https://images.chesscomfiles.com/uploads/v1/user/301758489.f8405d52.50x50o.c8f2bc25403d.jpg",
+      "twitch_url": "https://twitch.tv/unclejessi",
+      "url": "https://www.chess.com/member/UncleJessi",
+      "is_live": true,
+      "is_community_streamer": false,
+      "platforms": [
+        {
+          "type": "twitch",
+          "stream_url": "https://twitch.tv/unclejessi",
+          "channel_url": "https://twitch.tv/unclejessi",
+          "is_live": true,
+          "is_main_live_platform": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.0](https://github.com/denispianelli/chesscom/compare/v0.1.0...v0.2.0) (2026-05-29)
+
+
+### Features
+
+* add leaderboards, streamers, puzzle, and country endpoints ([#11](https://github.com/denispianelli/chesscom/issues/11)) ([26dc159](https://github.com/denispianelli/chesscom/commit/26dc159a572e5d4f358e5586348a08f55c41f9c8))
+
+
+### Bug Fixes
+
+* correct CJS type resolution and sync VERSION at build time ([#9](https://github.com/denispianelli/chesscom/issues/9)) ([f46e0e0](https://github.com/denispianelli/chesscom/commit/f46e0e01ff9b5e808dbcfc73dc518fe22f9c3299))
+
 ## 0.1.0 (2026-05-29)
 
 
